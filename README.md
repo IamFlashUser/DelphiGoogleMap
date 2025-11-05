@@ -2,7 +2,7 @@
 
 **TEdgeGoogleMapViewer**: a Delphi "WebView2" Component to View Google Map with integrated Routing and Markers Support
 
-### Actual official version 1.6.1 (VCL)
+### Actual official version 1.6.3 (VCL)
 
 | Component | Description |
 | - | - |
@@ -31,7 +31,7 @@ begin
   Location.Latitude := TEdgeGoogleMapViewer.TextToCoord(Latitude.Text);
   Location.Longitude := TEdgeGoogleMapViewer.TextToCoord(Longitude.Text);
   EdgeGoogleMapViewer.GotoLocation(Location);
-  
+
 //Setting Map View Mode
   EdgeGoogleMapViewer.MapTypeId := TGoogleMapTypeId(MapTypeIdComboBox.ItemIndex);
 ```
@@ -157,6 +157,14 @@ Load Customer Table, scroll down the table: for every record a Marker is added t
 No documentation available, but the Demo explain very well the use of the component.
 
 ### RELEASE NOTES
+05 Nov 2025 - Version 1.6.3
+- Added new properties inherited from TEdgeBrowser
+- Added new published property MapAPIKey
+
+07 Sep 2025 - Version 1.6.2
+- Added support for Delphi 13 - 32 and 64bit IDE
+- Updated DelphiGoogleMaps_Setup.exe
+
 12 Mar 2025 - Version 1.6.1
 - Added support for Delphi 12 64bit IDE
 - Added easy DelphiGoogleMaps_Setup.exe

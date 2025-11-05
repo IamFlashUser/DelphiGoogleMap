@@ -591,8 +591,6 @@ object formMain: TformMain
                     Height = 21
                     Align = alTop
                     TabOrder = 0
-                    ExplicitLeft = 88
-                    ExplicitWidth = 398
                   end
                 end
               end
@@ -612,11 +610,10 @@ object formMain: TformMain
                   AlignWithMargins = True
                   Left = 3
                   Top = 3
-                  Width = 483
+                  Width = 25
                   Height = 13
                   Align = alTop
                   Caption = 'Label'
-                  ExplicitWidth = 25
                 end
                 object editMarkerLabel: TEdit
                   AlignWithMargins = True
@@ -827,11 +824,10 @@ object formMain: TformMain
                       AlignWithMargins = True
                       Left = 3
                       Top = 3
-                      Width = 238
+                      Width = 39
                       Height = 13
                       Align = alTop
                       Caption = 'Latitude'
-                      ExplicitWidth = 39
                     end
                     object eCircleLat: TEdit
                       AlignWithMargins = True
@@ -855,11 +851,10 @@ object formMain: TformMain
                       AlignWithMargins = True
                       Left = 3
                       Top = 3
-                      Width = 239
+                      Width = 47
                       Height = 13
                       Align = alTop
                       Caption = 'Longitude'
-                      ExplicitWidth = 47
                     end
                     object eCircleLng: TEdit
                       AlignWithMargins = True
@@ -884,11 +879,10 @@ object formMain: TformMain
                     AlignWithMargins = True
                     Left = 3
                     Top = 3
-                    Width = 110
+                    Width = 32
                     Height = 13
                     Align = alTop
                     Caption = 'Radius'
-                    ExplicitWidth = 32
                   end
                   object eCircleRadius: TEdit
                     AlignWithMargins = True
@@ -1712,11 +1706,11 @@ object formMain: TformMain
     Height = 370
     Align = alClient
     TabOrder = 1
+    TabStop = True
     OnContainsFullScreenElementChanged = EdgeGoogleMapViewerContainsFullScreenElementChanged
     MapAddress = 'Via Santa Cecilia 4, Carugate, Milano'
-    MapLatitude = 25.767314000000000000
+    MapLatitude = 25.767315000000000000
     MapLongitude = -80.135694000000000000
-    BeforeShowMap = EdgeGoogleMapViewerBeforeShowMap
   end
   object DBGrid: TDBGrid
     Left = 0

@@ -30,7 +30,7 @@ unit MainForm;
 interface
 
 uses
-  WebView2, System.SysUtils, Winapi.ActiveX, Vcl.Forms,
+  Winapi.WebView2, System.SysUtils, Winapi.ActiveX, Vcl.Forms,
   Vcl.GoogleMap, Vcl.Edge, Data.DB, Datasnap.DBClient, Vcl.Menus, Vcl.ExtCtrls,
   Vcl.DBCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Samples.Spin,
   Vcl.Controls, System.Classes, Vcl.Mask, Vcl.ComCtrls, Vcl.Buttons;
@@ -260,7 +260,6 @@ type
     procedure ButtonRouteByAddressClick(Sender: TObject);
     procedure LoadTableButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure EdgeGoogleMapViewerBeforeShowMap(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure CheckBoxDirectionPanelClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -652,12 +651,6 @@ begin
   EdgeGoogleMapViewer.ShowTraffic(CheckBoxTraffic.Checked);
  end;
 
-procedure TformMain.EdgeGoogleMapViewerBeforeShowMap(Sender: TObject);
-begin
-  if TEdgeGoogleMapViewer.ApiKey = '' then
-    raise Exception.Create('Error: you must put your Google API Key into TEdgeGoogleMapViewer: change initialization section!');
-end;
-
 procedure TformMain.EdgeGoogleMapViewerContainsFullScreenElementChanged(
   Sender: TCustomEdgeBrowser; ContainsFullScreenElement: Boolean);
 begin
@@ -670,6 +663,7 @@ end;
 initialization
   //Setup UserDataFolder for Temp files
   TEdgeGoogleMapViewer.RegisterUserDataFolder(System.IOUtils.TPath.GetTempPath+ExtractFileName(ParamStr(0)));
+
   //Use your Google API Key to setup the viewer
   //TEdgeGoogleMapViewer.RegisterGoogleMapsApiKey('xyz');
 

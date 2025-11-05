@@ -45,9 +45,14 @@ uses
   , Vcl.StdCtrls
   ;
 
+resourcestring
+  ERROR_CANNOT_INITALIZE = 'Error: cannot initilize Google Map Viewer!';
+  CHECK_DLL_IN_APP_PATH = 'Check if webview2loader.dll is present in System Path or Application Path';
+  ERROR_API_KEY = 'Error: you must put your Google API Key into TEdgeGoogleMapViewer.APIKey property!';
+
 const
   DEFAULT_ZOOM_FACTOR = 15;
-  DelphiGoogleMapViewerVersion = '1.6.1';
+  DelphiGoogleMapViewerVersion = '1.6.3';
 
 Type
   EGoogleMapError = Exception;
@@ -185,9 +190,11 @@ Type
     procedure SetOnMapClick(const Value: TEdgeGoogleMapViewMapClick);
     procedure SetOnMapRightClick(const Value: TEdgeGoogleMapViewMapClick);
     procedure SetOnMapZoom(const Value: TEdgeGoogleMapViewZoomChanged);
+    function GetAPIKey: string;
+    procedure SetApiKey(const Value: string);
+    procedure CheckAPIKeyPresent;
   protected
     procedure Loaded; override;
-    procedure ShowMap(AMapCenter: TLatLng; const AAddress: string = ''); overload;
     function GetHTMLHeader: string; virtual;
     function GetHTMLStyle : string; virtual;
     function GetHTMLScript: string; virtual;
@@ -235,6 +242,8 @@ Type
     procedure GotoAddress(const Address: string);
     procedure RouteByLocations;
     procedure RouteByAddresses;
+    //Different Show Methods
+    procedure ShowMap(AMapCenter: TLatLng; const AAddress: string = ''); overload;
     procedure ShowStreetViewControl(Show: boolean);
     procedure ShowBicycling(Show: boolean);
     procedure ShowTraffic(Show: boolean);
@@ -277,12 +286,28 @@ Type
     function ComputeDistanceBetween(Origin, Destination: TLatLng): Double;
 
   published
+    //Inherited Properties
     property Align;
     property Anchors;
     property TabOrder;
     property TabStop;
     property OnEnter;
     property OnExit;
+    {$IF CompilerVersion >= 35} //Delphi 11+
+    property BrowserExecutableFolder;
+    property UserDataFolder;
+    property PopupMenu;
+    {$ENDIF}
+    {$IF CompilerVersion >= 36} //Delphi 12+
+    property AdditionalBrowserArguments;
+    property AllowSingleSignOnUsingOSPrimaryAccount;
+    property Language;
+    property TargetCompatibleBrowserVersion;
+    {$ENDIF}
+    {$IF CompilerVersion >= 37} //Delphi 13+
+    property PopupMenuMode;
+    property InitScript;
+    {$ENDIF}
     property OnCapturePreviewCompleted;
     property OnContainsFullScreenElementChanged;
     property OnContentLoading;
@@ -297,14 +322,20 @@ Type
     property OnNavigationCompleted;
     property OnNewWindowRequested;
     property OnPermissionRequested;
+    {$IF CompilerVersion >= 36} //Delphi 12+
+    property OnDownloadStarting;
+    property OnPrintCompleted;
+    property OnPrintToPDFCompleted;
+    {$ENDIF}
     property OnProcessFailed;
     property OnScriptDialogOpening;
     property OnSourceChanged;
-    // property OnWebMessageReceived;
+    property OnWebMessageReceived;
     property OnWebResourceRequested;
     property OnWindowCloseRequested;
     property OnZoomFactorChanged;
     // Custom properties
+    property MapAPIKey: string read GetAPIKey write SetApiKey;
     property MapShowPanControl: boolean read FPanControl write SetPanControl default true;
     property MapShowZoomControl: boolean read FZoomControl write SetZoomControl default true;
     property MapShowTypeControl: boolean read FTypeControl write SetTypeControl default true;
@@ -373,7 +404,8 @@ procedure TEdgeGoogleMapViewer.CustomWebViewCreateComplete(
   Sender: TCustomEdgeBrowser; AResult: HResult);
 begin
   if not self.WebViewCreated then
-    raise EGoogleMapError.Create('Error: cannot initilize Google Map Viewer! Check if webview2loader.dll is present')
+  raise EGoogleMapError.Create(ERROR_CANNOT_INITALIZE+slineBreak+
+    CHECK_DLL_IN_APP_PATH)
   else
     FViewerReady := True;
   if Assigned(FOnCreateWebViewCompleted) then
@@ -891,6 +923,8 @@ begin
   if Assigned(FBeforeShowMap) then
     FBeforeShowMap(Self);
 
+  CheckAPIKeyPresent;
+
   MyAddress := FAddress;
   MyCenter := FMapCenter;
 
@@ -960,6 +994,16 @@ begin
   FAddress := Value;
   if MapVisible then
     GotoAddress(Value);
+end;
+
+procedure TEdgeGoogleMapViewer.SetApiKey(const Value: string);
+begin
+  RegisterGoogleMapsApiKey(Value);
+end;
+
+function TEdgeGoogleMapViewer.GetAPIKey: string;
+begin
+  Result := FApiKey;
 end;
 
 procedure TEdgeGoogleMapViewer.SetBicycling(const Value: boolean);
@@ -1047,7 +1091,6 @@ end;
 
 procedure TEdgeGoogleMapViewer.HideMap;
 begin
-  InitMap;
   FMapVisible := False;
 
   if Assigned(FAfterHideMap) then
@@ -1069,7 +1112,6 @@ end;
 procedure TEdgeGoogleMapViewer.Loaded;
 begin
   inherited;
-  InitMap;
   SetVisible(MapVisible);
 end;
 
@@ -1185,8 +1227,9 @@ end;
 
 procedure TEdgeGoogleMapViewer.SetVisible(const Value: boolean);
 begin
-  if not (csDesigning in ComponentState) then
+  if not (csDesigning in ComponentState) and not (csLoading in ComponentState) then
   begin
+    InitMap;
     if Value then
       ShowMap(EmptyLatLng)
     else
@@ -1350,6 +1393,12 @@ begin
     B2S(FMapShowDirectionsPanel)
     ]);
   ExecuteScript(ScriptCommand);
+end;
+
+procedure TEdgeGoogleMapViewer.CheckAPIKeyPresent;
+begin
+  if FApiKey = '' then
+    raise EGoogleMapError.Create(ERROR_API_KEY);
 end;
 
 procedure TEdgeGoogleMapViewer.GotoAddress(const Address: string);
